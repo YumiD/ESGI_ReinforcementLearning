@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7856176639052399972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7856176639052399978}
+  - component: {fileID: 7856176639052399979}
+  m_Layer: 0
+  m_Name: Grid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7856176639052399978
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7856176639052399972}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7856176639052399979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7856176639052399972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c750c7235ed78a54fbbbb5ff33987010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 11400000, guid: 5e9b1b05c1017e14aaaa6557edd4288c, type: 2}
+  listPrefab:
+  - key: 0
+    value: {fileID: 6752520858734162425, guid: 1fbc39c8ad0ec374b991572cf8669c8e, type: 3}
+  - key: 1
+    value: {fileID: 8147595266161510602, guid: 8d7f52b9d7ec63e4784b2b9513419c4b, type: 3}
+  - key: 2
+    value: {fileID: 6005833882484637176, guid: cb13274fd94ccc54c9a27510eb65b2fd, type: 3}
+  - key: 3
+    value: {fileID: 2578168644019460381, guid: cd3d4a46c3ac0d446a05ff8b1afd8ca3, type: 3}
+  - key: 4
+    value: {fileID: 8682987476014824115, guid: c4e7ab803857a2f4c9108be2de80e79b, type: 3}
+  - key: 5
+    value: {fileID: 6346864656653170917, guid: 15067dc33b1598241b6200826a76d43d, type: 3}
+  - key: 7
+    value: {fileID: 4615725967775738588, guid: 50b4cf17cccaf1142bd00ebeaf59410e, type: 3}
+  cam: {fileID: 0}

@@ -14,7 +14,7 @@ namespace Utilities
             
             if (!File.Exists(path))
             {
-                Debug.LogError("Invalid path");
+                Debug.LogError("Invalid path : " + path);
                 return null;
             }
 

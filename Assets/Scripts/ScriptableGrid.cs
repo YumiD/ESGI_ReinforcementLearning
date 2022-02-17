@@ -1,41 +1,55 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Utilities;
 
 [CreateAssetMenu(fileName = "Grid", menuName = "ESGI/Grid")]
 public class ScriptableGrid : ScriptableObject
 {
-    [SerializeField] private int height, width;
+    private int _height, _width;
 
     [SerializeField] private Vector2 spawnPos;
 
     [SerializeField] private string folderName;
     [SerializeField] private string fileName;
-
-    private int[,] _gridCoordinate;
+    
+    private State _state = new State();
 
     public void InitGrid()
     {
-        _gridCoordinate = new int[width, height];
         var array = RetrieveFile.GetFile(folderName, fileName);
-        for (int i = 0; i < array.Length; i++)
+        _width = array.Length;
+        _height = array[0].Replace(" ", string.Empty).Length;
+        foreach (var line in array)
+        {
+            if (line.Replace(" ", string.Empty).Length > _height)
+            {
+                _height = line.Replace(" ", string.Empty).Length;
+            }
+        }
+        _state.Grid = new int[_width, _height];
+        for (int i = _width - 1; i >= 0; i--)
         {
             var words = array[i].Split(' ');
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             {
-                if (!string.IsNullOrEmpty(words[j]))
+                if (i == (int)spawnPos.x && j == (int)spawnPos.y)
                 {
-                    _gridCoordinate[i, j] = int.Parse(words[j]);
+                    _state.Grid[_width - 1 - i, j] = (int)TileType.Player;
+                }
+                else if (!string.IsNullOrEmpty(words[j]))
+                {
+                    _state.Grid[i, j] = int.Parse(words[j]);
                 }
             }
         }
     }
 
-    public int Height => height;
+    public int Height => _height;
 
-    public int Width => width;
+    public int Width => _width;
 
-    public int[,] GridCoordinate => _gridCoordinate;
+    public State State => _state;
 
     public Vector2 SpawnPos => spawnPos;
 }

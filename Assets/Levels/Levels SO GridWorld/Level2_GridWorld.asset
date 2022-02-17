@@ -10,10 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f3076f906e24de9ae83ceb4b65b3a3d, type: 3}
-  m_Name: Level2
+  m_Name: Level2_GridWorld
   m_EditorClassIdentifier: 
-  height: 8
-  width: 8
-  spawnPos: {x: 0, y: 0}
-  folderName: Levels
+  spawnPos: {x: 1, y: 1}
+  folderName: Levels/GridWorld
   fileName: Level2.txt
