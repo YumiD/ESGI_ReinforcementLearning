@@ -1,11 +1,20 @@
 ﻿using System;
 using UnityEngine;
 
+public enum Movement
+{
+    Up = 1,
+    Down = -1,
+    Right = 1,
+    Left = -1
+}
+
 public class PlayerController : MonoBehaviour
 {
     private ScriptableGrid _grid;
     private Grid2D _grid2D;
     private Vector2 _currentPosition;
+    private TileType _oldTile = TileType.Ground;
 
     public void Spawn(ScriptableGrid grid, Vector2 currentPos, Grid2D grid2D)
     {
@@ -30,44 +39,56 @@ public class PlayerController : MonoBehaviour
             var oldPosition = _currentPosition;
             if (horizontal != 0 || vertical != 0)
             {
-                if (horizontal < 0) // Aller a gauche
+                bool crateInFront;
+                if (horizontal != 0)
                 {
-                    if (_currentPosition.x - 1 >= 0)
+                    crateInFront = _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
+                                       (int)_currentPosition.x - (horizontal > 0
+                                           ? (int)Movement.Right
+                                           : (int)Movement.Left)] ==
+                                   (int)TileType.Crate;
+                    if (_grid2D.IsActionPossible(horizontal > 0 ? Movement.Right : Movement.Left,
+                            new Vector2Int((int)_currentPosition.x + (int)horizontal, (int)_currentPosition.y),
+                            crateInFront, horizontal != 0))
                     {
-                        _currentPosition.x--;
-                        transform.position = new Vector2(transform1.x - 1, transform1.y);
+                        _currentPosition.x += (int)horizontal;
+                        transform.position = new Vector2(transform1.x + horizontal, transform1.y);
                     }
                 }
-                else if (horizontal > 0) // Aller a droite
+                else
                 {
-                    if (_currentPosition.x + 1 < _grid.Width)
+                    crateInFront =
+                        _grid.State.Grid[
+                            _grid.Height - 1 - (int)_currentPosition.y - (vertical > 0
+                                ? (int)Movement.Up
+                                : (int)Movement.Down), (int)_currentPosition.x] == (int)TileType.Crate;
+                    if (_grid2D.IsActionPossible(vertical > 0 ? Movement.Up : Movement.Down,
+                            new Vector2Int((int)_currentPosition.x, (int)_currentPosition.y + (int)vertical),
+                            crateInFront, horizontal != 0))
                     {
-                        _currentPosition.x++;
-                        transform.position = new Vector2(transform1.x + 1, transform1.y);
-                    }
-                }
-                else if (vertical != 0)
-                {
-                    if (vertical < 0) // Aller en bas
-                    {
-                        if (_currentPosition.y - 1 >= 0)
-                        {
-                            _currentPosition.y--;
-                            transform.position = new Vector2(transform1.x, transform1.y - 1);
-                        }
-                    }
-                    else if (vertical > 0) // Aller en haut
-                    {
-                        if (_currentPosition.y + 1 < _grid.Height)
-                        {
-                            _currentPosition.y++;
-                            transform.position = new Vector2(transform1.x, transform1.y + 1);
-                        }
+                        _currentPosition.y += (int)vertical;
+                        transform.position = new Vector2(transform1.x, transform1.y + vertical);
                     }
                 }
 
                 CheckCurrentTile(_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x],
                     _currentPosition, oldPosition, _grid);
+                // Set what was behind the player
+                _grid.State.Grid[_grid.Height - 1 - (int)oldPosition.y, (int)oldPosition.x] =
+                    (int)_oldTile;
+                // Save the old tile, if crate, become ground
+                if ((TileType)_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
+                        (int)_currentPosition.x] == TileType.Crate)
+                {
+                    _oldTile = TileType.Ground;
+                }
+                else
+                {
+                    _oldTile = (TileType)_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
+                        (int)_currentPosition.x];
+                }
+
+                // Set player position on grid
                 _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x] =
                     (int)TileType.Player;
 
@@ -100,34 +121,27 @@ public class PlayerController : MonoBehaviour
             case (int)TileType.Crate:
                 if (old.x < curr.x) // Pousser vers la droite
                 {
-                    Debug.Log("Right");
-                    newPos = new Vector2(grid.Height - 1 - (int)curr.y, (int)curr.x + 1);
+                    newPos = new Vector2(_currentPosition.x + 1, _currentPosition.y);
                 }
                 else if (old.x > curr.x) // Pousser vers la gauche
                 {
-                    Debug.Log("Gauche");
-                    newPos = new Vector2(grid.Height - 1 - (int)curr.y, (int)curr.x - 1);
+                    newPos = new Vector2(_currentPosition.x - 1, _currentPosition.y);
                 }
                 else if (old.y < curr.y) // Pousser vers le haut
                 {
-                    Debug.Log("Up");
-                    newPos = new Vector2(grid.Height - 1 - (int)curr.y, (int)curr.x - 1);
+                    newPos = new Vector2(_currentPosition.x, _currentPosition.y + 1);
                 }
                 else if (old.y > curr.y) // Pousser vers le bas
                 {
-                    Debug.Log("Down");
-                    newPos = new Vector2(grid.Height - 1 - (int)curr.y, (int)curr.x - 1);
+                    newPos = new Vector2(_currentPosition.x, _currentPosition.y - 1);
                 }
-                grid.State.Grid[(int)newPos.y, (int)newPos.x] =
-                    grid.State.Grid[grid.Height - 1 - (int)curr.y, (int)curr.x];
+
+                grid.State.Grid[grid.Height - 1 - (int)newPos.y, (int)newPos.x] = tileValue;
+                var tileNb = (int)((grid.Height - 1 - curr.y) * grid.Width) + (int)curr.x;
+                _grid2D.MoveTile(tileNb, newPos);
                 break;
             default:
                 return;
         }
-
-        var tileNb = (int)((grid.Height - 1 - curr.y) * grid.Width) + (int)curr.x+1;
-        Debug.Log(tileNb);
-        Debug.Log(newPos);
-        _grid2D.MoveTile(tileNb, newPos);
     }
 }

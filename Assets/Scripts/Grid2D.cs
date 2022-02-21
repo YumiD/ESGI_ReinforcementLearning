@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
@@ -89,7 +90,47 @@ public class Grid2D : MonoBehaviour
 
     public void MoveTile(int tileNb, Vector2 newPos)
     {
-        Debug.Log(_everyTiles[tileNb] + " : " + _everyTiles[tileNb].transform.position);
-        _everyTiles[tileNb].transform.position = new Vector2(newPos.x, newPos.y);
+        var newPosInList = newPos.x + (grid.Height - 1 - newPos.y) * grid.Width;
+        (_everyTiles[tileNb], _everyTiles[(int)newPosInList]) = (_everyTiles[(int)newPosInList], _everyTiles[tileNb]);
+        _everyTiles[(int)newPosInList].transform.position = newPos;
+    }
+
+    public bool IsActionPossible(Movement movement, Vector2Int pos, bool pushCrate, bool isHorizontal)
+    {
+        var multiplier = pushCrate ? 2 : 1;
+        if (pos.x + multiplier * (int)movement < 0 || pos.x + (int)movement > grid.Width)
+        {
+            return false;
+        }
+
+        if (pos.y + multiplier * (int)movement < 0 || pos.y + (int)movement > grid.Height)
+        {
+            return false;
+        }
+
+        switch (grid.State.Grid[grid.Height - 1 - pos.y, pos.x])
+        {
+            case (int)TileType.Wall:
+            case (int)TileType.Void:
+            case (int)TileType.Obstacle:
+                return false;
+            case (int)TileType.Crate:
+            {
+                if (isHorizontal)
+                {
+                    pos.x += (int)movement;
+                }
+                else
+                {
+                    pos.y += (int)movement;
+                }
+
+                return grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Wall &&
+                       grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Void &&
+                       grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Obstacle;
+            }
+            default:
+                return true;
+        }
     }
 }
