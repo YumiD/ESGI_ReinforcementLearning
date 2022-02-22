@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f3076f906e24de9ae83ceb4b65b3a3d, type: 3}
-  m_Name: Level2_Sokoban
+  m_Name: Level4_Sokoban
   m_EditorClassIdentifier: 
   folderName: Levels/Sokoban
-  fileName: Level2.txt
+  fileName: Level4.txt

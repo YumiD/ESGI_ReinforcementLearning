@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public enum Movement
 {
@@ -33,83 +32,78 @@ public class PlayerController : MonoBehaviour
         var horizontal = Input.GetAxisRaw("Horizontal");
         var vertical = Input.GetAxisRaw("Vertical");
 
-        if (Input.anyKeyDown)
+        if (!Input.anyKeyDown) return;
+        var transform1 = transform.position;
+        var oldPosition = _currentPosition;
+        if (horizontal == 0 && vertical == 0) return;
+        bool crateInFront;
+        if (horizontal != 0)
         {
-            var transform1 = transform.position;
-            var oldPosition = _currentPosition;
-            if (horizontal != 0 || vertical != 0)
+            crateInFront = _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
+                (int)_currentPosition.x - (horizontal > 0
+                    ? (int)Movement.Right
+                    : (int)Movement.Left)] == (int)TileType.Crate;
+            if (_grid2D.IsActionPossible(horizontal > 0 ? Movement.Right : Movement.Left,
+                    new Vector2Int((int)_currentPosition.x + (int)horizontal, (int)_currentPosition.y),
+                    crateInFront, horizontal != 0))
             {
-                bool crateInFront;
-                if (horizontal != 0)
-                {
-                    crateInFront = _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
-                                       (int)_currentPosition.x - (horizontal > 0
-                                           ? (int)Movement.Right
-                                           : (int)Movement.Left)] ==
-                                   (int)TileType.Crate;
-                    if (_grid2D.IsActionPossible(horizontal > 0 ? Movement.Right : Movement.Left,
-                            new Vector2Int((int)_currentPosition.x + (int)horizontal, (int)_currentPosition.y),
-                            crateInFront, horizontal != 0))
-                    {
-                        _currentPosition.x += (int)horizontal;
-                        transform.position = new Vector2(transform1.x + horizontal, transform1.y);
-                    }
-                }
-                else
-                {
-                    crateInFront =
-                        _grid.State.Grid[
-                            _grid.Height - 1 - (int)_currentPosition.y - (vertical > 0
-                                ? (int)Movement.Up
-                                : (int)Movement.Down), (int)_currentPosition.x] == (int)TileType.Crate;
-                    if (_grid2D.IsActionPossible(vertical > 0 ? Movement.Up : Movement.Down,
-                            new Vector2Int((int)_currentPosition.x, (int)_currentPosition.y + (int)vertical),
-                            crateInFront, horizontal != 0))
-                    {
-                        _currentPosition.y += (int)vertical;
-                        transform.position = new Vector2(transform1.x, transform1.y + vertical);
-                    }
-                }
-
-                CheckCurrentTile(_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x],
-                    _currentPosition, oldPosition, _grid);
-                // Set what was behind the player
-                _grid.State.Grid[_grid.Height - 1 - (int)oldPosition.y, (int)oldPosition.x] =
-                    (int)_oldTile;
-                // Save the old tile, if crate, become ground
-                if ((TileType)_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
-                        (int)_currentPosition.x] == TileType.Crate)
-                {
-                    _oldTile = TileType.Ground;
-                }
-                else
-                {
-                    _oldTile = (TileType)_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
-                        (int)_currentPosition.x];
-                }
-
-                // Set player position on grid
-                _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x] =
-                    (int)TileType.Player;
-
-                // // Display player position on grid map
-                // for (int i = 0; i < _grid.Height; i++)
-                // {
-                //     string t = String.Empty;
-                //     for (int j = 0; j < _grid.Width; j++)
-                //     {
-                //         t += _grid.State.Grid[i, j].ToString();
-                //     }
-                //
-                //     print(t);
-                // }
+                _currentPosition.x += (int)horizontal;
+                transform.position = new Vector2(transform1.x + horizontal, transform1.y);
             }
         }
+        else
+        {
+            crateInFront =
+                _grid.State.Grid[
+                    _grid.Height - 1 - (int)_currentPosition.y - (vertical > 0
+                        ? (int)Movement.Up
+                        : (int)Movement.Down), (int)_currentPosition.x] == (int)TileType.Crate;
+            if (_grid2D.IsActionPossible(vertical > 0 ? Movement.Up : Movement.Down,
+                    new Vector2Int((int)_currentPosition.x, (int)_currentPosition.y + (int)vertical),
+                    crateInFront, horizontal != 0))
+            {
+                _currentPosition.y += (int)vertical;
+                transform.position = new Vector2(transform1.x, transform1.y + vertical);
+            }
+        }
+
+        CheckCurrentTile(_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x],
+            _currentPosition, oldPosition, _grid);
+        // Set what was behind the player
+        _grid.State.Grid[_grid.Height - 1 - (int)oldPosition.y, (int)oldPosition.x] =
+            (int)_oldTile;
+        // Save the old tile, if crate, become ground
+        if ((TileType)_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
+                (int)_currentPosition.x] == TileType.Crate)
+        {
+            _oldTile = TileType.Ground;
+        }
+        else
+        {
+            _oldTile = (TileType)_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y,
+                (int)_currentPosition.x];
+        }
+
+        // Set player position on grid
+        _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x] =
+            (int)TileType.Player;
+
+        // // Display player position on grid map
+        // for (int i = 0; i < _grid.Height; i++)
+        // {
+        //     string t = String.Empty;
+        //     for (int j = 0; j < _grid.Width; j++)
+        //     {
+        //         t += _grid.State.Grid[i, j].ToString();
+        //     }
+        //
+        //     print(t);
+        // }
     }
 
     private void CheckCurrentTile(int tileValue, Vector2 curr, Vector2 old, ScriptableGrid grid)
     {
-        Vector2 newPos = Vector2.zero;
+        var newPos = Vector2.zero;
         switch (tileValue)
         {
             case (int)TileType.Goal:
@@ -119,19 +113,19 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("Lose");
                 break;
             case (int)TileType.Crate:
-                if (old.x < curr.x) // Pousser vers la droite
+                if (old.x < curr.x) // Push to the right
                 {
                     newPos = new Vector2(_currentPosition.x + 1, _currentPosition.y);
                 }
-                else if (old.x > curr.x) // Pousser vers la gauche
+                else if (old.x > curr.x) // Push to the left
                 {
                     newPos = new Vector2(_currentPosition.x - 1, _currentPosition.y);
                 }
-                else if (old.y < curr.y) // Pousser vers le haut
+                else if (old.y < curr.y) // Push toward the top
                 {
                     newPos = new Vector2(_currentPosition.x, _currentPosition.y + 1);
                 }
-                else if (old.y > curr.y) // Pousser vers le bas
+                else if (old.y > curr.y) // Push toward the bottom
                 {
                     newPos = new Vector2(_currentPosition.x, _currentPosition.y - 1);
                 }

@@ -265,5 +265,9 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 318784888}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: grid
+      value: 
+      objectReference: {fileID: 11400000, guid: 0a63d879a80f25d4b8a6720ce77605d2, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}

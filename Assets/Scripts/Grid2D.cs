@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 public enum TileType
@@ -37,12 +35,10 @@ public class Grid2D : MonoBehaviour
 
     private void Spawn()
     {
-        for (int i = 0; i < grid.Width; i++)
+        for (var i = 0; i < grid.Width; i++)
         {
-            // string w = string.Empty;
-            for (int j = 0; j < grid.Height; j++)
+            for (var j = 0; j < grid.Height; j++)
             {
-                // w += _gridCoordinate[i, j].ToString();
                 if (_gridCoordinate[i, j] == (int)TileType.Void)
                 {
                     _everyTiles.Add(null);
@@ -56,14 +52,14 @@ public class Grid2D : MonoBehaviour
 
                 switch (_gridCoordinate[i, j])
                 {
-                    case (int)TileType.Player: // Spawn le player au dessus des tiles
+                    case (int)TileType.Player: // Spawn player on ground tile
                         Instantiate(_listPrefabDictionary[(int)TileType.Ground],
                             new Vector2(j, grid.Width - 1 - i),
                             Quaternion.identity);
                         obj.GetComponent<PlayerController>()
                             .Spawn(grid, new Vector2(grid.SpawnPos.y, grid.SpawnPos.x), this);
                         break;
-                    // Spawn de tile ground pour eviter que l'objet flotte se pose sur rien
+                    // Spawn under objects
                     case (int)TileType.Obstacle:
                     case (int)TileType.Crate:
                     case (int)TileType.GoalCrate:
@@ -73,7 +69,6 @@ public class Grid2D : MonoBehaviour
                         break;
                 }
             }
-            // Debug.Log(w);
         }
     }
 
@@ -127,7 +122,8 @@ public class Grid2D : MonoBehaviour
 
                 return grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Wall &&
                        grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Void &&
-                       grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Obstacle;
+                       grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Obstacle &&
+                       grid.State.Grid[grid.Height - 1 - pos.y, pos.x] != (int)TileType.Crate;
             }
             default:
                 return true;
