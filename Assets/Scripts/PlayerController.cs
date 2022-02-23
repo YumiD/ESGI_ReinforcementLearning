@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Utilities;
 
 public enum Movement
 {
@@ -24,13 +25,15 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Move();
-    }
-
-    private void Move()
-    {
         var horizontal = Input.GetAxisRaw("Horizontal");
         var vertical = Input.GetAxisRaw("Vertical");
+        Move(new Vector2(horizontal, vertical));
+    }
+
+    private void Move(Vector2 movement)
+    {
+        var horizontal = movement.x;
+        var vertical = movement.y;
 
         if (!Input.anyKeyDown) return;
         var transform1 = transform.position;
@@ -66,7 +69,6 @@ public class PlayerController : MonoBehaviour
                 transform.position = new Vector2(transform1.x, transform1.y + vertical);
             }
         }
-
         CheckCurrentTile(_grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x],
             _currentPosition, oldPosition, _grid);
         // Set what was behind the player
@@ -87,18 +89,8 @@ public class PlayerController : MonoBehaviour
         // Set player position on grid
         _grid.State.Grid[_grid.Height - 1 - (int)_currentPosition.y, (int)_currentPosition.x] =
             (int)TileType.Player;
-
-        // // Display player position on grid map
-        // for (int i = 0; i < _grid.Height; i++)
-        // {
-        //     string t = String.Empty;
-        //     for (int j = 0; j < _grid.Width; j++)
-        //     {
-        //         t += _grid.State.Grid[i, j].ToString();
-        //     }
-        //
-        //     print(t);
-        // }
+        
+        // DebugDisplay.DisplayGrid(_grid);
     }
 
     private void CheckCurrentTile(int tileValue, Vector2 curr, Vector2 old, ScriptableGrid grid)
@@ -130,6 +122,7 @@ public class PlayerController : MonoBehaviour
                     newPos = new Vector2(_currentPosition.x, _currentPosition.y - 1);
                 }
 
+                _grid2D.VerifyCrateOnGoal(newPos, _currentPosition);
                 grid.State.Grid[grid.Height - 1 - (int)newPos.y, (int)newPos.x] = tileValue;
                 var tileNb = (int)((grid.Height - 1 - curr.y) * grid.Width) + (int)curr.x;
                 _grid2D.MoveTile(tileNb, newPos);

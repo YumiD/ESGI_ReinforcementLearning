@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum TileType
@@ -22,6 +23,7 @@ public class Grid2D : MonoBehaviour
     private Dictionary<int, GameObject> _listPrefabDictionary;
     private int[,] _gridCoordinate;
     private List<GameObject> _everyTiles = new List<GameObject>();
+    private Dictionary<Vector2, bool> _goalPositionState = new Dictionary<Vector2, bool>();
 
     private void Start()
     {
@@ -60,9 +62,11 @@ public class Grid2D : MonoBehaviour
                             .Spawn(grid, new Vector2(grid.SpawnPos.y, grid.SpawnPos.x), this);
                         break;
                     // Spawn under objects
+                    case (int)TileType.GoalCrate:
+                        _goalPositionState.Add(new Vector2(i, j), false);
+                        goto case (int)TileType.Obstacle;
                     case (int)TileType.Obstacle:
                     case (int)TileType.Crate:
-                    case (int)TileType.GoalCrate:
                         Instantiate(_listPrefabDictionary[(int)TileType.Ground],
                             new Vector2(j, grid.Width - 1 - i),
                             Quaternion.identity);
@@ -86,6 +90,7 @@ public class Grid2D : MonoBehaviour
     public void MoveTile(int tileNb, Vector2 newPos)
     {
         var newPosInList = newPos.x + (grid.Height - 1 - newPos.y) * grid.Width;
+        // Swap gameobject to match the scene grid on array grid
         (_everyTiles[tileNb], _everyTiles[(int)newPosInList]) = (_everyTiles[(int)newPosInList], _everyTiles[tileNb]);
         _everyTiles[(int)newPosInList].transform.position = newPos;
     }
@@ -128,5 +133,29 @@ public class Grid2D : MonoBehaviour
             default:
                 return true;
         }
+    }
+
+    public void VerifyCrateOnGoal(Vector2 cratePosition, Vector2 playerPosition)
+    {
+        if (grid.State.Grid[grid.Height - 1 - (int)cratePosition.y, (int)cratePosition.x] == (int)TileType.GoalCrate)
+        {
+            var crateArrayPos = new Vector2(grid.Height - 1 - cratePosition.y, cratePosition.x);
+            if (_goalPositionState.ContainsKey(crateArrayPos))
+            {
+                _goalPositionState[crateArrayPos] = !_goalPositionState[crateArrayPos];
+            }   
+        }
+
+        var playerArrayPos = new Vector2(grid.Height - 1 - (int)playerPosition.y, (int)playerPosition.x);
+        if (_goalPositionState.ContainsKey(playerArrayPos))
+        {
+            _goalPositionState[playerArrayPos] = false;
+        }
+
+        if (_goalPositionState.Any(kv => !kv.Value))
+        {
+            return;
+        }
+        Debug.Log("Win");
     }
 }
