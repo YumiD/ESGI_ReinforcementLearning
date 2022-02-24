@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using Utilities;
 
 public enum Movement
@@ -15,19 +17,31 @@ public class PlayerController : MonoBehaviour
     private Grid2D _grid2D;
     private Vector2 _currentPosition;
     private TileType _oldTile = TileType.Ground;
+    private List<Vector2> _listOfMoves = new List<Vector2>();
 
-    public void Spawn(ScriptableGrid grid, Vector2 currentPos, Grid2D grid2D)
+    public void Spawn(ScriptableGrid grid, Vector2 currentPos, Grid2D grid2D, List<Vector2> listOfMoves)
     {
         _grid = grid;
         _grid2D = grid2D;
         _currentPosition = currentPos;
+        _listOfMoves = listOfMoves;
+        
+        // Example of policy in input (raw input but will be replaced by list on parameter
+        _listOfMoves.Add(new Vector2(1, 0));
+        _listOfMoves.Add(new Vector2(0, 1));
+        _listOfMoves.Add(new Vector2(1, 0));
+
+        StartCoroutine(PlayMoves(_listOfMoves, _listOfMoves[0]));
     }
 
     private void Update()
     {
-        var horizontal = Input.GetAxisRaw("Horizontal");
-        var vertical = Input.GetAxisRaw("Vertical");
-        Move(new Vector2(horizontal, vertical));
+        // var horizontal = Input.GetAxisRaw("Horizontal");
+        // var vertical = Input.GetAxisRaw("Vertical");
+        // if (Input.anyKeyDown)
+        // {
+            // Move(new Vector2(horizontal, vertical));
+        // }
     }
 
     private void Move(Vector2 movement)
@@ -35,7 +49,7 @@ public class PlayerController : MonoBehaviour
         var horizontal = movement.x;
         var vertical = movement.y;
 
-        if (!Input.anyKeyDown) return;
+        // if (!Input.anyKeyDown) return;
         var transform1 = transform.position;
         var oldPosition = _currentPosition;
         if (horizontal == 0 && vertical == 0) return;
@@ -130,5 +144,18 @@ public class PlayerController : MonoBehaviour
             default:
                 return;
         }
+    }
+
+    private IEnumerator PlayMoves(List<Vector2> listOfMoves, Vector2 move)
+    {
+        yield return new WaitForSeconds(.5f);
+        Move(move);
+        listOfMoves.RemoveAt(0);
+        if (listOfMoves.Count == 0)
+        {
+            Debug.Log("End of Moves.");
+            yield break;
+        }
+        StartCoroutine(PlayMoves(listOfMoves, listOfMoves[0]));
     }
 }

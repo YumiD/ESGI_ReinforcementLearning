@@ -59,7 +59,7 @@ public class Grid2D : MonoBehaviour
                             new Vector2(j, grid.Width - 1 - i),
                             Quaternion.identity);
                         obj.GetComponent<PlayerController>()
-                            .Spawn(grid, new Vector2(grid.SpawnPos.y, grid.SpawnPos.x), this);
+                            .Spawn(grid, new Vector2(grid.SpawnPos.y, grid.SpawnPos.x), this, new List<Vector2>());
                         break;
                     // Spawn under objects
                     case (int)TileType.GoalCrate:
