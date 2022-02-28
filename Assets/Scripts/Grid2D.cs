@@ -21,9 +21,13 @@ public class Grid2D : MonoBehaviour
     [SerializeField] private Camera cam;
 
     private Dictionary<int, GameObject> _listPrefabDictionary;
-    private int[,] _gridCoordinate;
     private List<GameObject> _everyTiles = new List<GameObject>();
     private Dictionary<Vector2, bool> _goalPositionState = new Dictionary<Vector2, bool>();
+
+    public int Height { get; private set; }
+    public int Width { get; private set; }
+
+    public Cell[,] GridCoordinate { get; private set; }
 
     private void Start()
     {
@@ -41,18 +45,18 @@ public class Grid2D : MonoBehaviour
         {
             for (var j = 0; j < grid.Height; j++)
             {
-                if (_gridCoordinate[i, j] == (int)TileType.Void)
+                if (GridCoordinate[i, j].value == (int)TileType.Void)
                 {
                     _everyTiles.Add(null);
                     continue;
                 }
 
-                var obj = Instantiate(_listPrefabDictionary[_gridCoordinate[i, j]],
+                var obj = Instantiate(_listPrefabDictionary[GridCoordinate[i, j].value],
                     new Vector2(j, grid.Width - 1 - i),
                     Quaternion.identity);
                 _everyTiles.Add(obj);
 
-                switch (_gridCoordinate[i, j])
+                switch (GridCoordinate[i, j].value)
                 {
                     case (int)TileType.Player: // Spawn player on ground tile
                         Instantiate(_listPrefabDictionary[(int)TileType.Ground],
@@ -79,7 +83,26 @@ public class Grid2D : MonoBehaviour
     private void InitList()
     {
         grid.InitGrid();
-        _gridCoordinate = grid.State.Grid.Clone() as int[,];
+        Height = grid.Height;
+        Width = grid.Width;
+        GridCoordinate = new Cell[grid.Width, grid.Height];
+        for (var i = 0; i < grid.Width; i++)
+        {
+            for (var j = 0; j < grid.Height; j++)
+            {
+                var cellOnGrid = listPrefab.Find(c => c.key == grid.State.Grid[i, j]);
+                if (cellOnGrid != null)
+                {
+                    GridCoordinate[i, j] = new Cell(grid.State.Grid[i, j],
+                        listPrefab.Find(c => c.key == grid.State.Grid[i, j]).reward);
+                }
+                else
+                {
+                    GridCoordinate[i, j] = new Cell(grid.State.Grid[i, j], -1);
+                }
+            }
+        }
+
         _listPrefabDictionary = new Dictionary<int, GameObject>();
         foreach (var prefab in listPrefab)
         {
@@ -143,7 +166,7 @@ public class Grid2D : MonoBehaviour
             if (_goalPositionState.ContainsKey(crateArrayPos))
             {
                 _goalPositionState[crateArrayPos] = !_goalPositionState[crateArrayPos];
-            }   
+            }
         }
 
         var playerArrayPos = new Vector2(grid.Height - 1 - (int)playerPosition.y, (int)playerPosition.x);
@@ -156,6 +179,7 @@ public class Grid2D : MonoBehaviour
         {
             return;
         }
+
         Debug.Log("Win");
     }
 }

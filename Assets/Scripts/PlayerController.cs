@@ -26,22 +26,22 @@ public class PlayerController : MonoBehaviour
         _currentPosition = currentPos;
         _listOfMoves = listOfMoves;
         
-        // Example of policy in input (raw input but will be replaced by list on parameter
-        _listOfMoves.Add(new Vector2(1, 0));
-        _listOfMoves.Add(new Vector2(0, 1));
-        _listOfMoves.Add(new Vector2(1, 0));
-
-        StartCoroutine(PlayMoves(_listOfMoves, _listOfMoves[0]));
+        // // Example of policy in input (raw input but will be replaced by list on parameter
+        // _listOfMoves.Add(new Vector2(1, 0));
+        // _listOfMoves.Add(new Vector2(0, 1));
+        // _listOfMoves.Add(new Vector2(1, 0));
+        //
+        // StartCoroutine(PlayMoves(_listOfMoves, _listOfMoves[0]));
     }
 
     private void Update()
     {
-        // var horizontal = Input.GetAxisRaw("Horizontal");
-        // var vertical = Input.GetAxisRaw("Vertical");
-        // if (Input.anyKeyDown)
-        // {
-            // Move(new Vector2(horizontal, vertical));
-        // }
+        var horizontal = Input.GetAxisRaw("Horizontal");
+        var vertical = Input.GetAxisRaw("Vertical");
+        if (Input.anyKeyDown)
+        {
+            Move(new Vector2(horizontal, vertical));
+        }
     }
 
     private void Move(Vector2 movement)
