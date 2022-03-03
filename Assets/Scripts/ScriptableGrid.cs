@@ -43,6 +43,7 @@ public class ScriptableGrid : ScriptableObject
                 }
             }
         }
+        _state.displayState();
     }
 
     public int Height => _height;

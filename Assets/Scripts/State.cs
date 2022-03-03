@@ -7,4 +7,8 @@
         get => _grid;
         set => _grid = value;
     }
+
+    public void displayState()
+    {
+    }
 }
