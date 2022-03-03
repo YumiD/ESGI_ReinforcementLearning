@@ -6,51 +6,43 @@ using Utilities;
 [CreateAssetMenu(fileName = "Grid", menuName = "ESGI/Grid")]
 public class ScriptableGrid : ScriptableObject
 {
-    private int _height, _width;
-
-    [SerializeField] private Vector2 spawnPos;
-
     [SerializeField] private string folderName;
     [SerializeField] private string fileName;
-    
-    private State _state = new State();
 
     public void InitGrid()
     {
         var array = RetrieveFile.GetFile(folderName, fileName);
-        _width = array.Length;
-        _height = array[0].Replace(" ", string.Empty).Length;
+        Width = array.Length;
+        Height = array[0].Replace(" ", string.Empty).Length;
         foreach (var line in array)
         {
-            if (line.Replace(" ", string.Empty).Length > _height)
+            if (line.Replace(" ", string.Empty).Length > Height)
             {
-                _height = line.Replace(" ", string.Empty).Length;
+                Height = line.Replace(" ", string.Empty).Length;
             }
         }
-        _state.Grid = new int[_width, _height];
-        for (int i = _width - 1; i >= 0; i--)
+
+        State.Grid = new int[Width, Height];
+        for (var i = Width - 1; i >= 0; i--)
         {
             var words = array[i].Split(' ');
-            for (int j = 0; j < _height; j++)
+            for (var j = 0; j < Height; j++)
             {
-                if (i == (int)spawnPos.x && j == (int)spawnPos.y)
+                if (int.Parse(words[j]) == (int)TileType.Player)
                 {
-                    _state.Grid[_width - 1 - i, j] = (int)TileType.Player;
+                    SpawnPos = new Vector2(Width - 1 -i, j);
                 }
-                else if (!string.IsNullOrEmpty(words[j]))
-                {
-                    _state.Grid[i, j] = int.Parse(words[j]);
-                }
+                State.Grid[i, j] = int.Parse(words[j]);
             }
         }
         _state.displayState();
     }
 
-    public int Height => _height;
+    public int Height { get; private set; }
 
-    public int Width => _width;
+    public int Width { get; private set; }
 
-    public State State => _state;
+    public State State { get; } = new State();
 
-    public Vector2 SpawnPos => spawnPos;
+    public Vector2 SpawnPos { get; private set; }
 }

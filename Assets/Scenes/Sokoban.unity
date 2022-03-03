@@ -265,5 +265,29 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 318784888}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: grid
+      value: 
+      objectReference: {fileID: 11400000, guid: 7d6993e955cc0f3409a721ceaf3fb300, type: 2}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: listPrefab.Array.data[1].reward
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: listPrefab.Array.data[2].reward
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: listPrefab.Array.data[4].reward
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: listPrefab.Array.data[5].reward
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7856176639052399979, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
+      propertyPath: listPrefab.Array.data[6].reward
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0d2363e92dd2db4e856f346ab042e15, type: 3}
