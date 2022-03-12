@@ -30,12 +30,11 @@ public class ScriptableGrid : ScriptableObject
             {
                 if (int.Parse(words[j]) == (int)TileType.Player)
                 {
-                    SpawnPos = new Vector2(Width - 1 -i, j);
+                    SpawnPos = new Vector2(Width - 1 - i, j);
                 }
                 State.Grid[i, j] = int.Parse(words[j]);
             }
         }
-        _state.displayState();
     }
 
     public int Height { get; private set; }

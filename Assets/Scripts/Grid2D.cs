@@ -182,4 +182,62 @@ public class Grid2D : MonoBehaviour
 
         Debug.Log("Win");
     }
+
+    public Vector2Int GetDeplacementPosition(PossibleMovement movement, Vector2Int pos)
+    {
+        Vector2Int nextPos = new Vector2Int(pos.x, pos.y);
+        switch (movement)
+        {
+            case PossibleMovement.Up:
+                nextPos.y -= 1;
+                break;
+            case PossibleMovement.Down:
+                nextPos.y += 1;
+                break;
+            case PossibleMovement.Right:
+                nextPos.x += 1;
+                break;
+            case PossibleMovement.Left:
+                nextPos.x -= 1;
+                break;
+            default:
+                break;
+        }
+        if (nextPos.x < 0 || nextPos.x >= grid.Width || nextPos.y < 0 || nextPos.y >= grid.Height)
+            return new Vector2Int(int.MinValue, int.MinValue); ;
+        return nextPos;
+    }
+    public bool CanMove(PossibleMovement movement, Vector2Int pos, bool pushCrate)
+    {
+        Vector2Int nextPos = GetDeplacementPosition(movement, pos);
+        if (nextPos.x == int.MinValue && nextPos.y == int.MinValue)
+            return false;
+        switch (grid.State.Grid[nextPos.y, nextPos.x])
+        {
+            case (int)TileType.Ground:
+                return true;
+            case (int)TileType.Player:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public void Display()
+    {
+        for (var i = 0; i < grid.Width; i++)
+        {
+            string output = "";
+            for (var j = 0; j < grid.Height; j++)
+            {
+                //output += " " + grid.State.Grid[i,j];
+                output += " " + GridCoordinate[i, j].value;
+            }
+            print(output);
+        }
+        print("Height : "+grid.Height);
+        print("Width : " + grid.Width);
+        print("SpawnPos : " + grid.SpawnPos);
+        print(GridCoordinate[(int)grid.SpawnPos.x, (int)grid.SpawnPos.y]);
+    }
 }

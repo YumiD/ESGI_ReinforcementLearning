@@ -10,6 +10,7 @@ public enum Movement
     Right = 1,
     Left = -1
 }
+public enum PossibleMovement{Up, Down, Right, Left};
 
 public class PlayerController : MonoBehaviour
 {
