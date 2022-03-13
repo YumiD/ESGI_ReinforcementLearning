@@ -251,7 +251,7 @@ namespace Algos
                     output += " " + _valueFunction[x, y].ToString("F2");
                     if (grid.EveryTiles[k].TryGetComponent(out CellDisplay cell))
                     {
-                        cell.DisplayValue(_valueFunction[x, y]);
+                        cell.DisplayValue(_valueFunction[x, y].ToString("F2"));
                     }
 
                     k++;
@@ -273,7 +273,7 @@ namespace Algos
                     output += " " + _policyFunction[x, y];
                     if (grid.EveryTiles[k].TryGetComponent(out CellDisplay cell))
                     {
-                        cell.DisplayValue(_valueFunction[x, y]);
+                        cell.DisplayValue(_policyFunction[x, y].ToString());
                     }
 
                     k++;

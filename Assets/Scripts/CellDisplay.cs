@@ -9,9 +9,9 @@ public class CellDisplay : MonoBehaviour
     [SerializeField] private Text value;
     [SerializeField] private Canvas canvas;
 
-    public void DisplayValue(float val)
+    public void DisplayValue(string val)
     {
         canvas.gameObject.SetActive(!canvas.gameObject.activeSelf);
-        value.text = val.ToString("F2");
+        value.text = val;
     }
 }
