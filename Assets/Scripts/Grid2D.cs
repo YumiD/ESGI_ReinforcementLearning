@@ -64,6 +64,7 @@ public class Grid2D : MonoBehaviour
                             Quaternion.identity);
                         obj.GetComponent<PlayerController>()
                             .Spawn(grid, new Vector2(grid.SpawnPos.y, grid.SpawnPos.x), this, new List<Vector2>());
+                        obj.name = "Player";
                         break;
                     // Spawn under objects
                     case (int)TileType.GoalCrate:
@@ -207,12 +208,12 @@ public class Grid2D : MonoBehaviour
             return new Vector2Int(int.MinValue, int.MinValue); ;
         return nextPos;
     }
-    public bool CanMove(PossibleMovement movement, Vector2Int pos, bool pushCrate)
+    public bool CanMove(PossibleMovement movement, Vector2Int pos)
     {
         Vector2Int nextPos = GetDeplacementPosition(movement, pos);
         if (nextPos.x == int.MinValue && nextPos.y == int.MinValue)
             return false;
-        switch (grid.State.Grid[nextPos.y, nextPos.x])
+        switch (grid.State.Grid[nextPos.x, nextPos.y])
         {
             case (int)TileType.Ground:
                 return true;
@@ -230,14 +231,51 @@ public class Grid2D : MonoBehaviour
             string output = "";
             for (var j = 0; j < grid.Height; j++)
             {
-                //output += " " + grid.State.Grid[i,j];
-                output += " " + GridCoordinate[i, j].value;
+                output += " " + grid.State.Grid[i,j];
+                //output += " " + GridCoordinate[i, j].value;
             }
             print(output);
         }
-        print("Height : "+grid.Height);
+        /*print("Height : "+grid.Height);
         print("Width : " + grid.Width);
         print("SpawnPos : " + grid.SpawnPos);
-        print(GridCoordinate[(int)grid.SpawnPos.x, (int)grid.SpawnPos.y]);
+        print(GridCoordinate[(int)grid.SpawnPos.x, (int)grid.SpawnPos.y]);*/
+    }
+
+    public Vector2 getSpawnPos()
+    {
+        return grid.SpawnPos;
+    }
+    public Vector2 getGoalPos()
+    {
+        return grid.GoalPos;
+    }
+
+    public bool isGoalNear(Vector2Int pos)
+    {
+        //print("actual x et y" + pos.x + " " + pos.y);
+        //print("getGoalPos" + getGoalPos());
+        if (pos.x + 1 == getGoalPos().x && pos.y == getGoalPos().y)
+            return true;
+        if (pos.x - 1 == getGoalPos().x && pos.y == getGoalPos().y)
+            return true;
+        if (pos.x == getGoalPos().x && pos.y + 1 == getGoalPos().y)
+            return true;
+        if (pos.x == getGoalPos().x && pos.y - 1 == getGoalPos().y)
+            return true;
+        return false;
+    }
+
+    public Vector2 goToGoal(Vector2 pos)
+    {
+        if (pos.x + 1 == getGoalPos().x && pos.y == getGoalPos().y)
+            return new Vector2(1, 0);
+        if (pos.x - 1 == getGoalPos().x && pos.y == getGoalPos().y)
+            return new Vector2(-1, 0);
+        if (pos.x == getGoalPos().x && pos.y + 1 == getGoalPos().y)
+            return new Vector2(0, 1);
+        if (pos.x == getGoalPos().x && pos.y - 1 == getGoalPos().y)
+            return new Vector2(0, -1);
+        return new Vector2(0, 0);
     }
 }

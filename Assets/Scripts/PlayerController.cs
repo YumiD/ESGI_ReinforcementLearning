@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Move(Vector2 movement)
+    public void Move(Vector2 movement)
     {
         var horizontal = movement.x;
         var vertical = movement.y;

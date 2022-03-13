@@ -32,6 +32,10 @@ public class ScriptableGrid : ScriptableObject
                 {
                     SpawnPos = new Vector2(Width - 1 - i, j);
                 }
+                if (int.Parse(words[j]) == (int)TileType.Goal)
+                {
+                    GoalPos = new Vector2(Width - 1 - i, Height - 1 - j);
+                }
                 State.Grid[i, j] = int.Parse(words[j]);
             }
         }
@@ -44,4 +48,5 @@ public class ScriptableGrid : ScriptableObject
     public State State { get; } = new State();
 
     public Vector2 SpawnPos { get; private set; }
+    public Vector2 GoalPos { get; private set; }
 }

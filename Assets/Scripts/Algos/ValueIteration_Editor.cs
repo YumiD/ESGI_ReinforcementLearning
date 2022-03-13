@@ -15,5 +15,9 @@ public class ValueIteration_Editor : Editor
         {
             algo.RunAlgorithm();
         }
+        if (GUILayout.Button("Play Game"))
+        {
+            algo.PlayGame();
+        }
     }
 }
