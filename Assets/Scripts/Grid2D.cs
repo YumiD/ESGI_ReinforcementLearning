@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum TileType
 {
@@ -277,5 +278,10 @@ public class Grid2D : MonoBehaviour
         if (pos.x == getGoalPos().x && pos.y - 1 == getGoalPos().y)
             return new Vector2(0, -1);
         return new Vector2(0, 0);
+    }
+
+    public void RestartGrid()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
