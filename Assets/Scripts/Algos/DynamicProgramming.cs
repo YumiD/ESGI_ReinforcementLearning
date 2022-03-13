@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace Algos
 {
     public class DynamicProgramming : MonoBehaviour, IAlgorithm
@@ -15,13 +16,19 @@ namespace Algos
 
         private const float GAMMA = 0.9f;
 
-        public enum DynamicAlgos {Value,Policy};
+        public enum DynamicAlgos
+        {
+            Value,
+            Policy
+        };
+
         private DynamicAlgos currentDynamicAlgo;
 
         public void InitGrid()
         {
             grid.RestartGrid(); //TODO Better Restart
         }
+
         public void InitAlgorithm()
         {
             _rewardFunction = new float[grid.Width, grid.Height];
@@ -51,7 +58,8 @@ namespace Algos
                 {
                     for (var j = 0; j < grid.Height; j++)
                     {
-                        if (grid.GridCoordinate[j, i].value == (int)TileType.Player || grid.GridCoordinate[j, i].value == (int)TileType.Ground)
+                        if (grid.GridCoordinate[j, i].value == (int)TileType.Player ||
+                            grid.GridCoordinate[j, i].value == (int)TileType.Ground)
                         {
                             float oldValue = _valueFunction[i, j];
 
@@ -62,18 +70,23 @@ namespace Algos
                                 if (grid.CanMove(movement, currentPosition))
                                 {
                                     Vector2Int newPosition = grid.GetDeplacementPosition(movement, currentPosition);
-                                    float value = _rewardFunction[newPosition.x, newPosition.y] + GAMMA * _valueFunction[newPosition.x, newPosition.y]; //TODO comment ça newPosition???
+                                    float value = _rewardFunction[newPosition.x, newPosition.y] +
+                                                  GAMMA * _valueFunction[newPosition.x,
+                                                      newPosition.y]; //TODO comment ï¿½a newPosition???
                                     if (value > maxValue)
                                         maxValue = value;
                                 }
                             }
+
                             if (maxValue != float.MinValue)
                                 _valueFunction[i, j] = maxValue;
                         }
                     }
                 }
+
                 instance++;
             }
+
             DisplayValueGrid();
         }
 
@@ -89,12 +102,13 @@ namespace Algos
                     _policyFunction[i, j] = FindBestDirection(new Vector2Int(i, j));
                 }
             }
+
             DisplayPolicyGrid();
         }
 
         public void PlayGame()
         {
-            if(currentDynamicAlgo==DynamicAlgos.Value)
+            if (currentDynamicAlgo == DynamicAlgos.Value)
                 StartCoroutine(StepValue());
             if (currentDynamicAlgo == DynamicAlgos.Policy)
                 StartCoroutine(StepPolicy());
@@ -103,7 +117,8 @@ namespace Algos
         private IEnumerator StepValue()
         {
             PlayerController PC = GameObject.Find("Player").GetComponent<PlayerController>();
-            Vector2Int currentPos = new Vector2Int((int)grid.getSpawnPos().x, grid.Height - 1 - (int)grid.getSpawnPos().y);
+            Vector2Int currentPos =
+                new Vector2Int((int)grid.getSpawnPos().x, grid.Height - 1 - (int)grid.getSpawnPos().y);
             bool victory = false;
             while (!victory)
             {
@@ -139,10 +154,12 @@ namespace Algos
                 }
             }
         }
+
         private IEnumerator StepPolicy()
         {
             PlayerController PC = GameObject.Find("Player").GetComponent<PlayerController>();
-            Vector2Int currentPos = new Vector2Int((int)grid.getSpawnPos().x, grid.Height - 1 - (int)grid.getSpawnPos().y);
+            Vector2Int currentPos =
+                new Vector2Int((int)grid.getSpawnPos().x, grid.Height - 1 - (int)grid.getSpawnPos().y);
             bool victory = false;
             while (!victory)
             {
@@ -177,7 +194,7 @@ namespace Algos
                     }
                 }
             }
-         }
+        }
 
         public PossibleMovement FindBestDirection(Vector2Int currentPos)
         {
@@ -191,6 +208,7 @@ namespace Algos
                     bestDirection = PossibleMovement.Up;
                 }
             }
+
             if (grid.CanMove(PossibleMovement.Down, currentPos))
             {
                 if (bestValue < _valueFunction[currentPos.x, currentPos.y + 1])
@@ -199,6 +217,7 @@ namespace Algos
                     bestDirection = PossibleMovement.Down;
                 }
             }
+
             if (grid.CanMove(PossibleMovement.Right, currentPos))
             {
                 if (bestValue < _valueFunction[currentPos.x + 1, currentPos.y])
@@ -207,6 +226,7 @@ namespace Algos
                     bestDirection = PossibleMovement.Right;
                 }
             }
+
             if (grid.CanMove(PossibleMovement.Left, currentPos))
             {
                 if (bestValue < _valueFunction[currentPos.x - 1, currentPos.y])
@@ -221,6 +241,7 @@ namespace Algos
 
         public void DisplayValueGrid()
         {
+            int k = 0;
             print("VALUES");
             for (var y = 0; y < grid.Height; y++)
             {
@@ -228,12 +249,21 @@ namespace Algos
                 for (var x = 0; x < grid.Width; x++)
                 {
                     output += " " + _valueFunction[x, y].ToString("F2");
+                    if (grid.EveryTiles[k].TryGetComponent(out CellDisplay cell))
+                    {
+                        cell.DisplayValue(_valueFunction[x, y]);
+                    }
+
+                    k++;
                 }
+
                 print(output);
             }
         }
+
         public void DisplayPolicyGrid()
         {
+            int k = 0;
             print("POLICY");
             for (var y = 0; y < grid.Height; y++)
             {
@@ -241,10 +271,18 @@ namespace Algos
                 for (var x = 0; x < grid.Width; x++)
                 {
                     output += " " + _policyFunction[x, y];
+                    if (grid.EveryTiles[k].TryGetComponent(out CellDisplay cell))
+                    {
+                        cell.DisplayValue(_valueFunction[x, y]);
+                    }
+
+                    k++;
                 }
+
                 print(output);
             }
         }
+
         public void RunAlgorithm()
         {
             throw new NotImplementedException();

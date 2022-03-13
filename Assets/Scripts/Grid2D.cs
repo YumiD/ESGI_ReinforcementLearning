@@ -22,13 +22,14 @@ public class Grid2D : MonoBehaviour
     [SerializeField] private Camera cam;
 
     private Dictionary<int, GameObject> _listPrefabDictionary;
-    private List<GameObject> _everyTiles = new List<GameObject>();
-    private Dictionary<Vector2, bool> _goalPositionState = new Dictionary<Vector2, bool>();
+    private readonly Dictionary<Vector2, bool> _goalPositionState = new Dictionary<Vector2, bool>();
 
     public int Height { get; private set; }
     public int Width { get; private set; }
 
     public Cell[,] GridCoordinate { get; private set; }
+
+    public List<GameObject> EveryTiles { get; } = new List<GameObject>();
 
     private void Start()
     {
@@ -48,14 +49,14 @@ public class Grid2D : MonoBehaviour
             {
                 if (GridCoordinate[i, j].value == (int)TileType.Void)
                 {
-                    _everyTiles.Add(null);
+                    EveryTiles.Add(null);
                     continue;
                 }
 
                 var obj = Instantiate(_listPrefabDictionary[GridCoordinate[i, j].value],
                     new Vector2(j, grid.Width - 1 - i),
                     Quaternion.identity);
-                _everyTiles.Add(obj);
+                EveryTiles.Add(obj);
 
                 switch (GridCoordinate[i, j].value)
                 {
@@ -116,8 +117,8 @@ public class Grid2D : MonoBehaviour
     {
         var newPosInList = newPos.x + (grid.Height - 1 - newPos.y) * grid.Width;
         // Swap gameobject to match the scene grid on array grid
-        (_everyTiles[tileNb], _everyTiles[(int)newPosInList]) = (_everyTiles[(int)newPosInList], _everyTiles[tileNb]);
-        _everyTiles[(int)newPosInList].transform.position = newPos;
+        (EveryTiles[tileNb], EveryTiles[(int)newPosInList]) = (EveryTiles[(int)newPosInList], EveryTiles[tileNb]);
+        EveryTiles[(int)newPosInList].transform.position = newPos;
     }
 
     public bool IsActionPossible(Movement movement, Vector2Int pos, bool pushCrate, bool isHorizontal)
