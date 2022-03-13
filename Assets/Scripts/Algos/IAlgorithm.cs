@@ -4,5 +4,6 @@
     {
         public void InitAlgorithm();
         public void RunAlgorithm();
+        public void PlayGame();
     }
 }

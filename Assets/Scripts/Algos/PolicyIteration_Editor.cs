@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(Algos.ValueIteration))]
-public class ValueIteration_Editor : Editor
+[CustomEditor(typeof(Algos.PolicyIteration))]
+public class PolicyIteration_Editor : Editor
 {
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
         //EditorGUILayout.LabelField("Label");
-        Algos.ValueIteration algo = (Algos.ValueIteration)target;
+        Algos.PolicyIteration algo = (Algos.PolicyIteration)target;
         if (GUILayout.Button("Run Algorithm"))
         {
             algo.RunAlgorithm();
-        }
-        if (GUILayout.Button("Play Game"))
-        {
-            algo.PlayGame();
         }
     }
 }
