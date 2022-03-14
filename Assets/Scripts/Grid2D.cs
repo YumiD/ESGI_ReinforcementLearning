@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -211,6 +212,20 @@ public class Grid2D : MonoBehaviour
             return new Vector2Int(int.MinValue, int.MinValue); ;
         return nextPos;
     }
+
+    public List<PossibleMovement> getPossibleActions(Vector2Int pos)
+    {
+        List<PossibleMovement> list = new List<PossibleMovement>();
+        foreach (PossibleMovement movement in Enum.GetValues(typeof(PossibleMovement)))
+        {
+            if (CanMove(movement, pos))
+            {
+                list.Add(movement);
+            }
+        }
+        return list;
+    }
+
     public bool CanMove(PossibleMovement movement, Vector2Int pos)
     {
         Vector2Int nextPos = GetDeplacementPosition(movement, pos);

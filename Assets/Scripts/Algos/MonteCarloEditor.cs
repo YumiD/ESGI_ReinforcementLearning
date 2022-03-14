@@ -11,19 +11,14 @@ public class MonteCarloEditor : Editor
         DrawDefaultInspector();
         //EditorGUILayout.LabelField("Label");
         Algos.MonteCarlo algo = (Algos.MonteCarlo)target;
-        if (GUILayout.Button("Initialize Grid"))
-        {
-            algo.InitGrid();
-        }
 
         if (GUILayout.Button("Run Monte Carlo ES Algorithm"))
-        {
             algo.MonteCarloESAlgorithm();
-        }
 
         if (GUILayout.Button("Play Game"))
-        {
             algo.PlayGame();
-        }
+
+        if (GUILayout.Button("Initialize Grid"))
+            algo.InitGrid();
     }
 }
