@@ -63,7 +63,7 @@ namespace Algos
                         {
                             float oldValue = _valueFunction[i, j];
 
-                            float maxValue = float.MinValue;
+                            float maxActionValue = float.MinValue;
                             Vector2Int currentPosition = new Vector2Int(i, j);
                             foreach (PossibleMovement movement in Enum.GetValues(typeof(PossibleMovement)))
                             {
@@ -71,20 +71,29 @@ namespace Algos
                                 {
                                     Vector2Int newPosition = grid.GetDeplacementPosition(movement, currentPosition);
                                     float value = _rewardFunction[newPosition.x, newPosition.y] +
-                                                  GAMMA * _valueFunction[newPosition.x,
-                                                      newPosition.y]; //TODO comment �a newPosition???
-                                    if (value > maxValue)
-                                        maxValue = value;
+                                                  GAMMA * _valueFunction[newPosition.x, newPosition.y];
+                                    if (value > maxActionValue)
+                                        maxActionValue = value;
                                 }
                             }
-
-                            if (maxValue != float.MinValue)
-                                _valueFunction[i, j] = maxValue;
+                            if (maxActionValue != float.MinValue)
+                                _valueFunction[i, j] = maxActionValue;
                         }
                     }
                 }
 
                 instance++;
+            }
+            for (var i = 0; i < grid.Width; i++)
+            {
+                for (var j = 0; j < grid.Height; j++)
+                {
+                    if (grid.GridCoordinate[j, i].value == (int)TileType.Goal ||
+                        grid.GridCoordinate[j, i].value == (int)TileType.Obstacle)
+                    {
+                       _valueFunction[i, j] = _rewardFunction[i, j];
+                    }
+                }
             }
 
             DisplayValueGrid();
@@ -118,39 +127,35 @@ namespace Algos
         {
             PlayerController PC = GameObject.Find("Player").GetComponent<PlayerController>();
             Vector2Int currentPos =
-                new Vector2Int((int)grid.getSpawnPos().x, grid.Height - 1 - (int)grid.getSpawnPos().y);
+                new Vector2Int((int)grid.getSpawnPos().y, grid.Width - 1 - (int)grid.getSpawnPos().x);
             bool victory = false;
             while (!victory)
             {
                 yield return new WaitForSeconds(0.5f);
-                if (grid.isGoalNear(currentPos))
+                switch (FindBestDirection(currentPos))
                 {
-                    PC.Move(grid.goToGoal(currentPos));
-                    victory = true;
+                    case PossibleMovement.Up:
+                        currentPos.y -= 1;
+                        PC.Move(new Vector2(0, 1));
+                        break;
+                    case PossibleMovement.Down:
+                        currentPos.y += 1;
+                        PC.Move(new Vector2(0, -1));
+                        break;
+                    case PossibleMovement.Right:
+                        currentPos.x += 1;
+                        PC.Move(new Vector2(1, 0));
+                        break;
+                    case PossibleMovement.Left:
+                        currentPos.x -= 1;
+                        PC.Move(new Vector2(-1, 0));
+                        break;
+                    default:
+                        break;
                 }
-                else
+                if (grid.isGoal(currentPos))
                 {
-                    switch (FindBestDirection(currentPos))
-                    {
-                        case PossibleMovement.Up:
-                            currentPos.y -= 1;
-                            PC.Move(new Vector2(0, 1));
-                            break;
-                        case PossibleMovement.Down:
-                            currentPos.y += 1;
-                            PC.Move(new Vector2(0, -1));
-                            break;
-                        case PossibleMovement.Right:
-                            currentPos.x += 1;
-                            PC.Move(new Vector2(1, 0));
-                            break;
-                        case PossibleMovement.Left:
-                            currentPos.x -= 1;
-                            PC.Move(new Vector2(-1, 0));
-                            break;
-                        default:
-                            break;
-                    }
+                    victory = true;
                 }
             }
         }
@@ -164,34 +169,30 @@ namespace Algos
             while (!victory)
             {
                 yield return new WaitForSeconds(0.5f);
-                if (grid.isGoalNear(currentPos))
+                switch (_policyFunction[currentPos.x, currentPos.y])
                 {
-                    PC.Move(grid.goToGoal(currentPos));
-                    victory = true;
+                    case PossibleMovement.Up:
+                        currentPos.y -= 1;
+                        PC.Move(new Vector2(0, 1));
+                        break;
+                    case PossibleMovement.Down:
+                        currentPos.y += 1;
+                        PC.Move(new Vector2(0, -1));
+                        break;
+                    case PossibleMovement.Right:
+                        currentPos.x += 1;
+                        PC.Move(new Vector2(1, 0));
+                        break;
+                    case PossibleMovement.Left:
+                        currentPos.x -= 1;
+                        PC.Move(new Vector2(-1, 0));
+                        break;
+                    default:
+                        break;
                 }
-                else
+                if (grid.isGoal(currentPos))
                 {
-                    switch (_policyFunction[currentPos.x, currentPos.y])
-                    {
-                        case PossibleMovement.Up:
-                            currentPos.y -= 1;
-                            PC.Move(new Vector2(0, 1));
-                            break;
-                        case PossibleMovement.Down:
-                            currentPos.y += 1;
-                            PC.Move(new Vector2(0, -1));
-                            break;
-                        case PossibleMovement.Right:
-                            currentPos.x += 1;
-                            PC.Move(new Vector2(1, 0));
-                            break;
-                        case PossibleMovement.Left:
-                            currentPos.x -= 1;
-                            PC.Move(new Vector2(-1, 0));
-                            break;
-                        default:
-                            break;
-                    }
+                    victory = true;
                 }
             }
         }
@@ -200,6 +201,7 @@ namespace Algos
         {
             float bestValue = float.MinValue;
             PossibleMovement bestDirection = (PossibleMovement)UnityEngine.Random.Range(0, 4);
+
             if (grid.CanMove(PossibleMovement.Up, currentPos))
             {
                 if (bestValue < _valueFunction[currentPos.x, currentPos.y - 1])
@@ -242,7 +244,7 @@ namespace Algos
         public void DisplayValueGrid()
         {
             int k = 0;
-            print("VALUES");
+            //print("VALUES");
             for (var y = 0; y < grid.Height; y++)
             {
                 string output = "";
@@ -257,14 +259,14 @@ namespace Algos
                     k++;
                 }
 
-                print(output);
+                //print(output);
             }
         }
 
         public void DisplayPolicyGrid()
         {
             int k = 0;
-            print("POLICY");
+            //print("POLICY");
             for (var y = 0; y < grid.Height; y++)
             {
                 string output = "";
@@ -279,7 +281,7 @@ namespace Algos
                     k++;
                 }
 
-                print(output);
+                //print(output);
             }
         }
 

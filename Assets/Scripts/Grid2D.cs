@@ -215,11 +215,13 @@ public class Grid2D : MonoBehaviour
         Vector2Int nextPos = GetDeplacementPosition(movement, pos);
         if (nextPos.x == int.MinValue && nextPos.y == int.MinValue)
             return false;
-        switch (grid.State.Grid[nextPos.x, nextPos.y])
+        switch (grid.State.Grid[nextPos.y, nextPos.x])
         {
             case (int)TileType.Ground:
                 return true;
             case (int)TileType.Player:
+                return true;
+            case (int)TileType.Goal:
                 return true;
             default:
                 return false;
@@ -253,32 +255,11 @@ public class Grid2D : MonoBehaviour
         return grid.GoalPos;
     }
 
-    public bool isGoalNear(Vector2Int pos)
+    public bool isGoal(Vector2Int pos)
     {
-        //print("actual x et y" + pos.x + " " + pos.y);
-        //print("getGoalPos" + getGoalPos());
-        if (pos.x + 1 == getGoalPos().x && pos.y == getGoalPos().y)
-            return true;
-        if (pos.x - 1 == getGoalPos().x && pos.y == getGoalPos().y)
-            return true;
-        if (pos.x == getGoalPos().x && pos.y + 1 == getGoalPos().y)
-            return true;
-        if (pos.x == getGoalPos().x && pos.y - 1 == getGoalPos().y)
+        if (pos.x == getGoalPos().y && pos.y == getGoalPos().x)
             return true;
         return false;
-    }
-
-    public Vector2 goToGoal(Vector2 pos)
-    {
-        if (pos.x + 1 == getGoalPos().x && pos.y == getGoalPos().y)
-            return new Vector2(1, 0);
-        if (pos.x - 1 == getGoalPos().x && pos.y == getGoalPos().y)
-            return new Vector2(-1, 0);
-        if (pos.x == getGoalPos().x && pos.y + 1 == getGoalPos().y)
-            return new Vector2(0, 1);
-        if (pos.x == getGoalPos().x && pos.y - 1 == getGoalPos().y)
-            return new Vector2(0, -1);
-        return new Vector2(0, 0);
     }
 
     public void RestartGrid()

@@ -34,7 +34,7 @@ public class ScriptableGrid : ScriptableObject
                 }
                 if (int.Parse(words[j]) == (int)TileType.Goal)
                 {
-                    GoalPos = new Vector2(Width - 1 - i, Height - 1 - j);
+                    GoalPos = new Vector2(i, j);
                 }
                 State.Grid[i, j] = int.Parse(words[j]);
             }
