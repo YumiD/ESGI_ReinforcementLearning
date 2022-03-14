@@ -95,20 +95,75 @@ namespace Algos
         {
             InitAlgorithm();
             currentDynamicAlgo = DynamicAlgos.Policy;
-            ValueIterationAlgorithm();
+
             for (var i = 0; i < grid.Width; i++)
             {
                 for (var j = 0; j < grid.Height; j++)
                 {
-                    _policyGrid[i, j] = FindBestDirection(new Vector2Int(i, j));
+                    if (grid.CanStateAct(i, j))
+                    {
+                        float maxActionValue = float.MinValue;
+                        Vector2Int currentPosition = new Vector2Int(i, j);
+                        if (grid.CanMove(_policyGrid[i, j], currentPosition))
+                        {
+                            Vector2Int newPosition = grid.GetDeplacementPosition(_policyGrid[i, j], currentPosition);
+                            float value = _rewardGrid[newPosition.x, newPosition.y] +
+                                            GAMMA * _valueGrid[newPosition.x, newPosition.y];
+                            if (value > maxActionValue)
+                                maxActionValue = value;
+                        }
+                        if (maxActionValue != float.MinValue)
+                            _valueGrid[i, j] = maxActionValue;
+                    }
                 }
             }
+            PolicyImprovement();
 
             DisplayPolicyGrid();
         }
 
+        public void PolicyImprovement()
+        {
+            bool stable = true;
+            for (var i = 0; i < grid.Width; i++)
+            {
+                for (var j = 0; j < grid.Height; j++)
+                {
+                    if (grid.CanStateAct(i, j))
+                    {
+                        PossibleMovement tempPolicy = _policyGrid[i, j];
+                        float maxActionValue = float.MinValue;
+                        Vector2Int currentPosition = new Vector2Int(i, j);
+                        foreach (PossibleMovement movement in Enum.GetValues(typeof(PossibleMovement)))
+                        {
+                            if (grid.CanMove(movement, currentPosition))
+                            {
+                                Vector2Int newPosition = grid.GetDeplacementPosition(movement, currentPosition);
+                                float value = _rewardGrid[newPosition.x, newPosition.y] +
+                                                GAMMA * _valueGrid[newPosition.x, newPosition.y];
+                                if (value > maxActionValue)
+                                {
+                                    maxActionValue = value;
+                                    _policyGrid[i, j] = movement;
+                                }
+                            }
+                        }
+                        if (maxActionValue != float.MinValue)
+                            _valueGrid[i, j] = maxActionValue;
+
+                        if (_policyGrid[i, j] != tempPolicy)
+                            stable = false;
+                    }
+                }
+            }
+
+            if (!stable)
+                PolicyImprovement();
+        }
+
         public void PlayGame()
         {
+            print(currentDynamicAlgo);
             if (currentDynamicAlgo == DynamicAlgos.Value)
                 StartCoroutine(StepValue());
             if (currentDynamicAlgo == DynamicAlgos.Policy)
@@ -156,10 +211,11 @@ namespace Algos
         {
             PlayerController PC = GameObject.Find("Player").GetComponent<PlayerController>();
             Vector2Int currentPos =
-                new Vector2Int((int)grid.getSpawnPos().x, grid.Height - 1 - (int)grid.getSpawnPos().y);
+                new Vector2Int((int)grid.getSpawnPos().y, grid.Width - 1 - (int)grid.getSpawnPos().x);
             bool victory = false;
             while (!victory)
             {
+                print(_policyGrid[currentPos.x, currentPos.y]);
                 yield return new WaitForSeconds(0.5f);
                 switch (_policyGrid[currentPos.x, currentPos.y])
                 {
