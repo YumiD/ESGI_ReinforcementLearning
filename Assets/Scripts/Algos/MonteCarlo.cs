@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Algos
 {
-    public class Q
+    public class state_and_action
     {
         private Vector2Int _pos;
         private PossibleMovement _action;
 
-        public Q(Vector2Int pos, PossibleMovement action)
+        public state_and_action(Vector2Int pos, PossibleMovement action)
         {
             _pos = pos;
             _action = action;
@@ -24,7 +24,8 @@ namespace Algos
 
         private float[,] _rewardGrid;
         private PossibleMovement[,] _policyGrid;
-        private Dictionary<Q, int> _QGrid;
+        private Dictionary<state_and_action, int> _QGrid;
+        private Dictionary<state_and_action, List<int>> _ReturnsGrid;
 
         private const float GAMMA = 0.9f;
 
@@ -32,7 +33,9 @@ namespace Algos
         {
             _rewardGrid = new float[grid.Width, grid.Height];
             _policyGrid = new PossibleMovement[grid.Width, grid.Height];
-            _QGrid = new Dictionary<Q, int>();
+            _QGrid = new Dictionary<state_and_action, int>();
+            _ReturnsGrid = new Dictionary<state_and_action, List<int>>();
+
 
             for (var i = 0; i < grid.Width; i++)
             {
@@ -42,7 +45,10 @@ namespace Algos
                     _policyGrid[i, j] = (PossibleMovement)UnityEngine.Random.Range(0, 4);
                     Vector2Int pos = new Vector2Int(i, j);
                     foreach (PossibleMovement action in grid.getPossibleActions(pos))
-                        _QGrid.Add(new Q(pos, action), 0);
+                    {
+                        _QGrid.Add(new state_and_action(pos, action), 0);
+                        _ReturnsGrid.Add(new state_and_action(pos, action), new List<int>());
+                    }
                 }
             }
         }
@@ -50,6 +56,9 @@ namespace Algos
         public void MonteCarloESAlgorithm()
         {
             InitAlgorithm();
+
+
+
             DisplayPolicyGrid();
         }
 
