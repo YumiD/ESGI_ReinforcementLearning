@@ -124,7 +124,6 @@ namespace Algos
 
         public void PolicyImprovement()
         {
-            _iterationPolicy++;
             bool stable = true;
             for (var i = 0; i < grid.Width; i++)
             {
