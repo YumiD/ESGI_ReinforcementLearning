@@ -154,7 +154,7 @@ namespace Algos
         }
         public void InitGrid()
         {
-            grid.RestartGrid(); //TODO Better Restart
+            grid.RestartGrid();
         }
     }
 }

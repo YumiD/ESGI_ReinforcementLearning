@@ -8,7 +8,7 @@ namespace Algos
     public class DynamicProgramming : MonoBehaviour, IAlgorithm
     {
         [SerializeField] private Grid2D grid;
-        [SerializeField] private int _INSTANCES_MAX = 50;
+        [SerializeField] private int _ITERATIONS_MAX = 50;
 
         private float[,] _rewardGrid;
         private float[,] _valueGrid;
@@ -24,10 +24,6 @@ namespace Algos
 
         private DynamicAlgos currentDynamicAlgo;
 
-        public void InitGrid()
-        {
-            grid.RestartGrid(); //TODO Better Restart
-        }
 
         public void InitAlgorithm()
         {
@@ -51,8 +47,8 @@ namespace Algos
             InitAlgorithm();
             currentDynamicAlgo = DynamicAlgos.Value;
 
-            int instance = 0;
-            while (instance < _INSTANCES_MAX)
+            int iteration = 0;
+            while (iteration < _ITERATIONS_MAX)
             {
                 for (var i = 0; i < grid.Width; i++)
                 {
@@ -79,7 +75,7 @@ namespace Algos
                     }
                 }
 
-                instance++;
+                iteration++;
             }
             for (var i = 0; i < grid.Width; i++)
             {
@@ -284,6 +280,11 @@ namespace Algos
         public void RunAlgorithm()
         {
             throw new NotImplementedException();
+        }
+
+        public void InitGrid()
+        {
+            grid.RestartGrid();
         }
     }
 }
