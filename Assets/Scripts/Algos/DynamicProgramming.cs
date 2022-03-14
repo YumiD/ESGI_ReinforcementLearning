@@ -124,6 +124,7 @@ namespace Algos
 
         public void PolicyImprovement()
         {
+            _iterationPolicy++;
             bool stable = true;
             for (var i = 0; i < grid.Width; i++)
             {
@@ -168,7 +169,6 @@ namespace Algos
             if (currentDynamicAlgo == DynamicAlgos.Policy)
                 StartCoroutine(StepPolicy());
         }
-
         private IEnumerator StepValue()
         {
             PlayerController PC = GameObject.Find("Player").GetComponent<PlayerController>();
