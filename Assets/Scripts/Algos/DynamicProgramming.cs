@@ -163,7 +163,6 @@ namespace Algos
 
         public void PlayGame()
         {
-            print(currentDynamicAlgo);
             if (currentDynamicAlgo == DynamicAlgos.Value)
                 StartCoroutine(StepValue());
             if (currentDynamicAlgo == DynamicAlgos.Policy)
@@ -215,7 +214,6 @@ namespace Algos
             bool victory = false;
             while (!victory)
             {
-                print(_policyGrid[currentPos.x, currentPos.y]);
                 yield return new WaitForSeconds(0.5f);
                 switch (_policyGrid[currentPos.x, currentPos.y])
                 {
