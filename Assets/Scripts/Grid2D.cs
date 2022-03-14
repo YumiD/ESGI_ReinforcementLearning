@@ -216,6 +216,8 @@ public class Grid2D : MonoBehaviour
     public List<PossibleMovement> getPossibleActions(Vector2Int pos)
     {
         List<PossibleMovement> list = new List<PossibleMovement>();
+        if(!CanStateAct(pos.x, pos.y))
+            return list;
         foreach (PossibleMovement movement in Enum.GetValues(typeof(PossibleMovement)))
         {
             if (CanMove(movement, pos))

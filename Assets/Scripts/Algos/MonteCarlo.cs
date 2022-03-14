@@ -5,50 +5,38 @@ using UnityEngine;
 
 namespace Algos
 {
-    public class state_and_action
-    {
-        private Vector2Int _pos;
-        private PossibleMovement _action;
-
-        public state_and_action(Vector2Int pos, PossibleMovement action)
-        {
-            _pos = pos;
-            _action = action;
-        }
-    }
-
     public class MonteCarlo : MonoBehaviour, IAlgorithm
     {
         [SerializeField] private Grid2D grid;
-        [SerializeField] private int _INSTANCES_MAX = 100;
+        [SerializeField] private int _ITERATIONS_MAX = 100;
 
         private float[,] _rewardGrid;
         private PossibleMovement[,] _policyGrid;
-        private Dictionary<state_and_action, int> _QGrid;
-        private Dictionary<state_and_action, List<int>> _ReturnsGrid;
+        private Dictionary<(Vector2Int, PossibleMovement), float> _QGrid;
+        private Dictionary<(Vector2Int, PossibleMovement), List<float>> _ReturnsGrid;
 
         private const float GAMMA = 0.9f;
+        private const float EPSILON = 0.2f;
 
         public void InitAlgorithm()
         {
             _rewardGrid = new float[grid.Width, grid.Height];
             _policyGrid = new PossibleMovement[grid.Width, grid.Height];
-            _QGrid = new Dictionary<state_and_action, int>();
-            _ReturnsGrid = new Dictionary<state_and_action, List<int>>();
-
+            _QGrid = new Dictionary<(Vector2Int, PossibleMovement), float>();
+            _ReturnsGrid = new Dictionary<(Vector2Int, PossibleMovement), List<float>>();
 
             for (var i = 0; i < grid.Width; i++)
             {
                 for (var j = 0; j < grid.Height; j++)
                 {
                     _rewardGrid[i, j] = grid.GridCoordinate[j, i].rewardValue;
-                    _policyGrid[i, j] = (PossibleMovement)UnityEngine.Random.Range(0, 4);
                     Vector2Int pos = new Vector2Int(i, j);
                     foreach (PossibleMovement action in grid.getPossibleActions(pos))
                     {
-                        _QGrid.Add(new state_and_action(pos, action), 0);
-                        _ReturnsGrid.Add(new state_and_action(pos, action), new List<int>());
+                        _QGrid.Add((pos, action), 0);
+                        _ReturnsGrid.Add((pos, action), new List<float>());
                     }
+                    _policyGrid[i, j] = (PossibleMovement)UnityEngine.Random.Range(0, 4);
                 }
             }
         }
@@ -57,9 +45,80 @@ namespace Algos
         {
             InitAlgorithm();
 
+            for(int iteration = 0; iteration<_ITERATIONS_MAX; iteration++)
+            {
+                //On génère un épisode
+                List<(Vector2Int, PossibleMovement, float)>  stateActionsReturns = GenerateEpisode();
+
+                //On calcule Q(s,a)
+                List<(Vector2Int, PossibleMovement)> seenStateActionPairs = new List<(Vector2Int, PossibleMovement)>();
+                foreach((Vector2Int, PossibleMovement, float) stateActionReturn in stateActionsReturns)
+                {
+                    (Vector2Int, PossibleMovement) stateAction = (stateActionReturn.Item1, stateActionReturn.Item2);
+                    if (!seenStateActionPairs.Contains(stateAction)) //On vérifie si on a pas déjà vu ce stateAction
+                    {
+                        //Ajouter G dans _ReturnsGrid[stateAction]
+                        //Q[s][a] = Moyenne des G de _ReturnsGrid[stateAction]
+                        seenStateActionPairs.Add(stateAction);
+                    }
+                }
+
+                //Remplir _policyGrid en fonction de la meilleure action par state
+                for (var i = 0; i < grid.Width; i++)
+                {
+                    for (var j = 0; j < grid.Height; j++)
+                    {
+                        _policyGrid[i, j] = FindBestPolicy(new Vector2Int(i, j));
+                    }
+                }
+            }
 
 
+            //Afficher Policy
             DisplayPolicyGrid();
+        }
+
+        public List<(Vector2Int, PossibleMovement, float)> GenerateEpisode()
+        {
+            //Sélectionner point de départ
+
+            //while(True) // On va jouer jusqu'à trouver la fin
+
+            return new List<(Vector2Int, PossibleMovement, float)>();
+        }
+
+        public PossibleMovement EpsilonGreedy(Vector2Int pos)
+        {
+            PossibleMovement movement = (PossibleMovement)UnityEngine.Random.Range(0, 4);
+            float p = UnityEngine.Random.Range(0.0f, 1.0f);
+            if (p < EPSILON)
+            {
+                while (!grid.CanMove(movement, pos))
+                    movement = (PossibleMovement)UnityEngine.Random.Range(0, 4);
+                return movement;
+            }
+            movement = _policyGrid[pos.x, pos.y];
+            return movement;
+        }
+
+        public PossibleMovement FindBestPolicy(Vector2Int currentPos)
+        {
+            float bestValue = float.MinValue;
+            PossibleMovement bestDirection = (PossibleMovement)UnityEngine.Random.Range(0, 4);
+
+            foreach(PossibleMovement movement in Enum.GetValues(typeof(PossibleMovement)))
+            {
+                if(_QGrid.ContainsKey((currentPos, movement)))
+                {
+                    if (bestValue < _QGrid[(currentPos, movement)] )
+                    {
+                        bestValue = _QGrid[(currentPos, movement)];
+                        bestDirection = movement;
+                    }
+                }
+            }
+
+            return bestDirection;
         }
 
         public void PlayGame()
