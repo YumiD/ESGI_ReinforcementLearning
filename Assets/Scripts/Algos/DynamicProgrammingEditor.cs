@@ -11,8 +11,8 @@ public class DynamicProgrammingEditor : Editor
         DrawDefaultInspector();
         //EditorGUILayout.LabelField("Label");
         Algos.DynamicProgramming algo = (Algos.DynamicProgramming)target;
-        //if (GUILayout.Button("Initialize Grid"))
-        //    algo.InitGrid();
+        if (GUILayout.Button("Initialize Grid"))
+            algo.InitGrid();
         if (GUILayout.Button("Run Value Iteration Algorithm"))
             algo.ValueIterationAlgorithm();
         if (GUILayout.Button("Run Policy Iteration Algorithm"))

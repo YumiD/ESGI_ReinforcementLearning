@@ -14,6 +14,7 @@ public enum TileType
     Void = 6,
     GoalCrate = 7
 }
+public enum PossibleMovement { Up, Down, Right, Left };
 
 public class Grid2D : MonoBehaviour
 {
@@ -226,6 +227,20 @@ public class Grid2D : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    public bool CanStateAct(int i, int j)
+    {
+        if (GridCoordinate[j, i].value == (int)TileType.Player || GridCoordinate[j, i].value == (int)TileType.Ground)
+            return true;
+        return false;
+    }
+    
+    public bool isStateEnd(int i, int j)
+    {
+        if (GridCoordinate[j, i].value == (int)TileType.Goal || GridCoordinate[j, i].value == (int)TileType.Obstacle)
+            return true;
+        return false;
     }
 
     public void Display()

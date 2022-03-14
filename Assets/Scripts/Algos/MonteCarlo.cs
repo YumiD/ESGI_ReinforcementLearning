@@ -9,6 +9,12 @@ namespace Algos
     {
         [SerializeField] private Grid2D grid;
         [SerializeField] private int _INSTANCES_MAX = 50;
+
+        private float[,] _rewardGrid;
+        private PossibleMovement[,] _policyGrid;
+
+        private const float GAMMA = 0.9f;
+
         public void InitGrid()
         {
             grid.RestartGrid(); //TODO Better Restart

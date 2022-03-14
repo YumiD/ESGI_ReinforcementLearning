@@ -10,9 +10,9 @@ namespace Algos
         [SerializeField] private Grid2D grid;
         [SerializeField] private int _INSTANCES_MAX = 50;
 
-        private float[,] _rewardFunction;
-        private float[,] _valueFunction;
-        private PossibleMovement[,] _policyFunction;
+        private float[,] _rewardGrid;
+        private float[,] _valueGrid;
+        private PossibleMovement[,] _policyGrid;
 
         private const float GAMMA = 0.9f;
 
@@ -31,17 +31,17 @@ namespace Algos
 
         public void InitAlgorithm()
         {
-            _rewardFunction = new float[grid.Width, grid.Height];
-            _valueFunction = new float[grid.Width, grid.Height];
-            _policyFunction = new PossibleMovement[grid.Width, grid.Height];
+            _rewardGrid = new float[grid.Width, grid.Height];
+            _valueGrid = new float[grid.Width, grid.Height];
+            _policyGrid = new PossibleMovement[grid.Width, grid.Height];
 
             for (var i = 0; i < grid.Width; i++)
             {
                 for (var j = 0; j < grid.Height; j++)
                 {
-                    _rewardFunction[i, j] = grid.GridCoordinate[j, i].rewardValue;
-                    _valueFunction[i, j] = 0.0f;
-                    _policyFunction[i, j] = (PossibleMovement)UnityEngine.Random.Range(0, 4);
+                    _rewardGrid[i, j] = grid.GridCoordinate[j, i].rewardValue;
+                    _valueGrid[i, j] = 0.0f;
+                    _policyGrid[i, j] = (PossibleMovement)UnityEngine.Random.Range(0, 4);
                 }
             }
         }
@@ -58,11 +58,8 @@ namespace Algos
                 {
                     for (var j = 0; j < grid.Height; j++)
                     {
-                        if (grid.GridCoordinate[j, i].value == (int)TileType.Player ||
-                            grid.GridCoordinate[j, i].value == (int)TileType.Ground)
+                        if(grid.CanStateAct(i, j))
                         {
-                            float oldValue = _valueFunction[i, j];
-
                             float maxActionValue = float.MinValue;
                             Vector2Int currentPosition = new Vector2Int(i, j);
                             foreach (PossibleMovement movement in Enum.GetValues(typeof(PossibleMovement)))
@@ -70,14 +67,14 @@ namespace Algos
                                 if (grid.CanMove(movement, currentPosition))
                                 {
                                     Vector2Int newPosition = grid.GetDeplacementPosition(movement, currentPosition);
-                                    float value = _rewardFunction[newPosition.x, newPosition.y] +
-                                                  GAMMA * _valueFunction[newPosition.x, newPosition.y];
+                                    float value = _rewardGrid[newPosition.x, newPosition.y] +
+                                                  GAMMA * _valueGrid[newPosition.x, newPosition.y];
                                     if (value > maxActionValue)
                                         maxActionValue = value;
                                 }
                             }
                             if (maxActionValue != float.MinValue)
-                                _valueFunction[i, j] = maxActionValue;
+                                _valueGrid[i, j] = maxActionValue;
                         }
                     }
                 }
@@ -88,10 +85,9 @@ namespace Algos
             {
                 for (var j = 0; j < grid.Height; j++)
                 {
-                    if (grid.GridCoordinate[j, i].value == (int)TileType.Goal ||
-                        grid.GridCoordinate[j, i].value == (int)TileType.Obstacle)
+                    if (grid.isStateEnd(i, j))
                     {
-                       _valueFunction[i, j] = _rewardFunction[i, j];
+                       _valueGrid[i, j] = _rewardGrid[i, j];
                     }
                 }
             }
@@ -108,7 +104,7 @@ namespace Algos
             {
                 for (var j = 0; j < grid.Height; j++)
                 {
-                    _policyFunction[i, j] = FindBestDirection(new Vector2Int(i, j));
+                    _policyGrid[i, j] = FindBestDirection(new Vector2Int(i, j));
                 }
             }
 
@@ -169,7 +165,7 @@ namespace Algos
             while (!victory)
             {
                 yield return new WaitForSeconds(0.5f);
-                switch (_policyFunction[currentPos.x, currentPos.y])
+                switch (_policyGrid[currentPos.x, currentPos.y])
                 {
                     case PossibleMovement.Up:
                         currentPos.y -= 1;
@@ -204,36 +200,36 @@ namespace Algos
 
             if (grid.CanMove(PossibleMovement.Up, currentPos))
             {
-                if (bestValue < _valueFunction[currentPos.x, currentPos.y - 1])
+                if (bestValue < _valueGrid[currentPos.x, currentPos.y - 1])
                 {
-                    bestValue = _valueFunction[currentPos.x, currentPos.y - 1];
+                    bestValue = _valueGrid[currentPos.x, currentPos.y - 1];
                     bestDirection = PossibleMovement.Up;
                 }
             }
 
             if (grid.CanMove(PossibleMovement.Down, currentPos))
             {
-                if (bestValue < _valueFunction[currentPos.x, currentPos.y + 1])
+                if (bestValue < _valueGrid[currentPos.x, currentPos.y + 1])
                 {
-                    bestValue = _valueFunction[currentPos.x, currentPos.y + 1];
+                    bestValue = _valueGrid[currentPos.x, currentPos.y + 1];
                     bestDirection = PossibleMovement.Down;
                 }
             }
 
             if (grid.CanMove(PossibleMovement.Right, currentPos))
             {
-                if (bestValue < _valueFunction[currentPos.x + 1, currentPos.y])
+                if (bestValue < _valueGrid[currentPos.x + 1, currentPos.y])
                 {
-                    bestValue = _valueFunction[currentPos.x + 1, currentPos.y];
+                    bestValue = _valueGrid[currentPos.x + 1, currentPos.y];
                     bestDirection = PossibleMovement.Right;
                 }
             }
 
             if (grid.CanMove(PossibleMovement.Left, currentPos))
             {
-                if (bestValue < _valueFunction[currentPos.x - 1, currentPos.y])
+                if (bestValue < _valueGrid[currentPos.x - 1, currentPos.y])
                 {
-                    bestValue = _valueFunction[currentPos.x - 1, currentPos.y];
+                    bestValue = _valueGrid[currentPos.x - 1, currentPos.y];
                     bestDirection = PossibleMovement.Left;
                 }
             }
@@ -250,10 +246,10 @@ namespace Algos
                 string output = "";
                 for (var x = 0; x < grid.Width; x++)
                 {
-                    output += " " + _valueFunction[x, y].ToString("F2");
+                    output += " " + _valueGrid[x, y].ToString("F2");
                     if (grid.EveryTiles[k].TryGetComponent(out CellDisplay cell))
                     {
-                        cell.DisplayValue(_valueFunction[x, y].ToString("F2"));
+                        cell.DisplayValue(_valueGrid[x, y].ToString("F2"));
                     }
 
                     k++;
@@ -272,10 +268,10 @@ namespace Algos
                 string output = "";
                 for (var x = 0; x < grid.Width; x++)
                 {
-                    output += " " + _policyFunction[x, y];
+                    output += " " + _policyGrid[x, y];
                     if (grid.EveryTiles[k].TryGetComponent(out CellDisplay cell))
                     {
-                        cell.DisplayValue(_policyFunction[x, y].ToString());
+                        cell.DisplayValue(_policyGrid[x, y].ToString());
                     }
 
                     k++;
