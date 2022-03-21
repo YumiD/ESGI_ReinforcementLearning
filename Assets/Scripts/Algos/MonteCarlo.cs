@@ -57,7 +57,6 @@ namespace Algos
                     (Vector2Int, PossibleMovement) stateAction = (stateActionReturn.Item1, stateActionReturn.Item2);
                     if (!seenStateActionPairs.Contains(stateAction)) //On vérifie si on a pas déjà vu ce stateAction
                     {
-                        //stateActionReturn.Item3 -> G
                         //Ajouter G dans _ReturnsGrid[stateAction]
                         //Q[s][a] = Moyenne des G de _ReturnsGrid[stateAction]
                         seenStateActionPairs.Add(stateAction);
@@ -84,14 +83,6 @@ namespace Algos
             //Sélectionner point de départ
 
             //while(True) // On va jouer jusqu'à trouver la fin
-
-            //Calculer les retours en faisant une back propagation
-            //G=0
-            //Pour chaque state et action visité
-                //On append dans la liste à retourner (state, action, G)
-                //G = reward + GAMMA * G
-
-            //Ne pas oublier de renvoyer une inversion de liste
 
             return new List<(Vector2Int, PossibleMovement, float)>();
         }
